@@ -258,6 +258,7 @@ struct fec_priv {
 #ifdef CONFIG_DM_GPIO
 	struct gpio_desc phy_reset_gpio;
 	uint32_t reset_delay;
+	u32 post_reset_delay;
 #endif
 #ifdef CONFIG_DM_ETH
 	u32 interface;
