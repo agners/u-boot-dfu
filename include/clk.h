@@ -315,4 +315,15 @@ static inline bool clk_valid(struct clk *clk)
 {
 	return !!clk->dev;
 }
+
+/**
+ * clk_get_by_id() - Get the clock by knowing its ID
+ *
+ * @id:	The clock ID to search for
+ *
+ * @c:	A pointer to clock struct that has been found among added clocks
+ *      to UCLASS_CLK
+ * @return zero on success, or -ve error code.
+ */
+int clk_get_by_id(ulong id, struct clk **c);
 #endif

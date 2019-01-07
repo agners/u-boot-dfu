@@ -5,6 +5,8 @@
 #
 
 obj-$(CONFIG_$(SPL_TPL_)CLK) += clk-uclass.o clk_fixed_rate.o
+obj-$(CONFIG_$(SPL_TPL_)CLK_CCF) += clk-fixed-factor.o clk.o clk-divider.o \
+				    clk-mux.o
 
 obj-y += imx/
 obj-y += tegra/
