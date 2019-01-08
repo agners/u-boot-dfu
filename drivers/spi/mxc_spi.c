@@ -7,6 +7,7 @@
 #include <dm.h>
 #include <malloc.h>
 #include <spi.h>
+#include <clk.h>
 #include <linux/errno.h>
 #include <asm/io.h>
 #include <asm/gpio.h>
@@ -50,6 +51,9 @@ struct mxc_spi_slave {
 	unsigned int	max_hz;
 	unsigned int	mode;
 	struct gpio_desc ss;
+#if CONFIG_IS_ENABLED(CLK)
+	struct clk per_clk;
+#endif
 };
 
 static inline struct mxc_spi_slave *to_mxc_spi_slave(struct spi_slave *slave)
@@ -494,6 +498,19 @@ static int mxc_spi_probe(struct udevice *bus)
 	const void *blob = gd->fdt_blob;
 	int ret;
 
+#if CONFIG_IS_ENABLED(CLK)
+	ret = clk_get_by_name(bus, "per", &mxcs->per_clk);
+	if (ret) {
+		printf("%s: Failed to get per_clk\n", __func__);
+		return ret;
+	}
+
+	ret = clk_enable(&mxcs->per_clk);
+	if (ret) {
+		printf("%s: Failed to enable per_clk\n", __func__);
+		return ret;
+	}
+#endif
 	if (gpio_request_by_name(bus, "cs-gpios", 0, &plat->ss,
 				 GPIOD_IS_OUT)) {
 		dev_err(bus, "No cs-gpios property\n");
