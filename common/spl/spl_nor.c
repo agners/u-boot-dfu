@@ -48,6 +48,11 @@ static int spl_nor_load_image(struct spl_image_info *spl_image,
 						  CONFIG_SYS_OS_BASE,
 						  (void *)header);
 
+#ifdef CONFIG_SYS_SPL_ARGS_ADDR
+			memcpy((void *)CONFIG_SYS_SPL_ARGS_ADDR,
+			       (void *)CONFIG_CMD_SPL_NOR_OFS,
+			       CONFIG_CMD_SPL_WRITE_SIZE);
+#endif
 			return ret;
 		}
 #endif
