@@ -16,6 +16,7 @@ int __weak soc_clk_dump(void)
 	struct udevice *dev;
 	struct uclass *uc;
 	struct clk clk;
+	ulong rate;
 	int ret;
 
 	/* Device addresses start at 1 */
@@ -37,7 +38,9 @@ int __weak soc_clk_dump(void)
 			continue;
 		}
 
-		printf("%-30.30s : %lu Hz\n", dev->name, clk_get_rate(&clk));
+		rate = clk_get_rate(&clk);
+		if (!IS_ERR_VALUE(rate))
+			printf("%-30.30s : %lu Hz\n", dev->name, rate);
 
 		clk_free(&clk);
 	}
