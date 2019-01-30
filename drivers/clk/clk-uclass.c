@@ -340,6 +340,47 @@ ulong clk_get_rate(struct clk *clk)
 	return ops->get_rate(clk);
 }
 
+ulong clk_get_parent_rate(struct clk *clk)
+{
+	const struct clk_ops *ops;
+	struct udevice *pdev;
+	struct clk pclk;
+	ulong rate;
+	int ret;
+
+	debug("%s(clk=%p)\n", __func__, clk);
+
+	pdev = clk->dev->parent;
+	if (!pdev)
+		return -ENODEV;
+
+	ops = clk_dev_ops(pdev);
+	if (!ops->get_rate)
+		return -ENOSYS;
+
+	/*
+	 * We do use memset, clk_{request|get_rate|free}
+	 * as there are clocks - like the "fixed" ones, which
+	 * doesn't posses the clk wrapper struct (just added to
+	 * UCLASS_CLK) and explicitly check if clk->id = 0.
+	 *
+	 * In fact the "clock" resources (like ops, description)
+	 * are accessed via udevice structure (pdev - parent's one)
+	 */
+
+	memset(&pclk, 0, sizeof(pclk));
+	ret = clk_request(pdev, &pclk);
+	if (ret) {
+		printf("%s: pclk: %s request failed!\n", __func__, pdev->name);
+		return ret;
+	}
+
+	rate = clk_get_rate(&pclk);
+	clk_free(&pclk);
+
+	return rate;
+}
+
 ulong clk_set_rate(struct clk *clk, ulong rate)
 {
 	const struct clk_ops *ops = clk_dev_ops(clk->dev);
